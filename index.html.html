@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方程式マスター｜商業高校1年生</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Sans', 'Yu Gothic', Meiryo, sans-serif;
+    background: linear-gradient(135deg, #fce4ec 0%, #e3f2fd 100%);
+    min-height: 100vh;
+    padding: 16px;
+    color: #333;
+    line-height: 1.6;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, #5e35b1, #3949ab);
+    color: white;
+    padding: 24px 20px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+  }
+  header h1 { font-size: 24px; margin-bottom: 6px; }
+  header p { font-size: 13px; opacity: 0.95; }
+  .school-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  /* モード切替タブ */
+  .mode-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: white;
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #777;
+    transition: all 0.2s;
+  }
+  .mode-tab.active {
+    background: linear-gradient(135deg, #5e35b1, #3949ab);
+    color: white;
+    box-shadow: 0 2px 6px rgba(94,53,177,0.3);
+  }
+
+  /* 学期タブ */
+  .semester-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .semester-tab {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 8px;
+    border: none;
+    background: white;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #555;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    border-bottom: 4px solid transparent;
+  }
+  .semester-tab.active.s1 { color: #e91e63; border-bottom-color: #e91e63; }
+  .semester-tab.active.s2 { color: #ff9800; border-bottom-color: #ff9800; }
+  .semester-tab.active.s3 { color: #4caf50; border-bottom-color: #4caf50; }
+  .semester-tab small { display: block; font-size: 10px; opacity: 0.7; font-weight: normal; margin-top: 2px; }
+
+  /* 方程式カード */
+  .equation-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 6px solid #5e35b1;
+  }
+  .equation-card.s1 { border-left-color: #e91e63; }
+  .equation-card.s2 { border-left-color: #ff9800; }
+  .equation-card.s3 { border-left-color: #4caf50; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .card-number {
+    background: #f0f0f0;
+    color: #555;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .card-title { font-size: 17px; font-weight: 700; color: #333; }
+
+  .formula-box {
+    background: linear-gradient(135deg, #fff3e0, #fff8e1);
+    border: 2px dashed #ff9800;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 12px 0;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    color: #e65100;
+    word-break: keep-all;
+    line-height: 1.8;
+  }
+
+  .section-label {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    margin-top: 12px;
+  }
+  .label-story { background: #e8f5e9; color: #2e7d32; }
+  .label-example { background: #e3f2fd; color: #1565c0; }
+  .label-point { background: #fce4ec; color: #c2185b; }
+
+  .story-box {
+    background: #f1f8e9;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .story-box .emoji { font-size: 20px; margin-right: 4px; }
+
+  .example-box {
+    background: #e1f5fe;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .example-box .answer {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #81d4fa;
+    color: #0277bd;
+    font-weight: 600;
+  }
+
+  .point-box {
+    background: #fce4ec;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #880e4f;
+    line-height: 1.7;
+  }
+
+  /* クイズ */
+  .quiz-container { background: white; padding: 24px 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .quiz-progress {
+    background: #f0f0f0;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .quiz-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #5e35b1, #3949ab);
+    transition: width 0.3s;
+  }
+  .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 16px;
+  }
+  .quiz-question {
+    background: linear-gradient(135deg, #f3e5f5, #e8eaf6);
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.8;
+    min-height: 80px;
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-option {
+    padding: 14px 16px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .quiz-option:hover:not(:disabled) {
+    border-color: #5e35b1;
+    background: #f3e5f5;
+  }
+  .quiz-option.correct {
+    background: #c8e6c9 !important;
+    border-color: #4caf50 !important;
+    color: #2e7d32;
+  }
+  .quiz-option.wrong {
+    background: #ffcdd2 !important;
+    border-color: #f44336 !important;
+    color: #c62828;
+  }
+  .quiz-option:disabled { cursor: not-allowed; }
+
+  .quiz-feedback {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.7;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #e8f5e9; color: #1b5e20; border-left: 4px solid #4caf50; }
+  .quiz-feedback.wrong { background: #ffebee; color: #b71c1c; border-left: 4px solid #f44336; }
+
+  .quiz-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 14px;
+    background: linear-gradient(135deg, #5e35b1, #3949ab);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .quiz-btn:hover { opacity: 0.9; }
+
+  .quiz-start {
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .quiz-start h2 { font-size: 20px; margin-bottom: 10px; color: #5e35b1; }
+  .quiz-start p { color: #666; margin-bottom: 20px; font-size: 14px; }
+  .quiz-range {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .range-btn {
+    padding: 10px 16px;
+    border: 2px solid #ddd;
+    border-radius: 999px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .range-btn.selected {
+    background: #5e35b1;
+    color: white;
+    border-color: #5e35b1;
+  }
+
+  .quiz-result {
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .result-score {
+    font-size: 48px;
+    font-weight: bold;
+    color: #5e35b1;
+    margin: 16px 0;
+  }
+  .result-message {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 12px;
+  }
+
+  @media (min-width: 600px) {
+    header h1 { font-size: 28px; }
+    .card-title { font-size: 19px; }
+    .formula-box { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>📘 方程式マスター</h1>
+    <p>商業科目の公式を「たとえ話」で楽しく覚えよう！</p>
+    <div class="school-badge">商業高校 1年生 向け</div>
+  </header>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="learn">📖 まなぶ</button>
+    <button class="mode-tab" data-mode="quiz">✏️ クイズ</button>
+  </div>
+
+  <!-- 学習モード -->
+  <div id="learn-mode">
+    <div class="semester-tabs">
+      <button class="semester-tab active s1" data-sem="1">
+        1学期
+        <small>基礎計算</small>
+      </button>
+      <button class="semester-tab s2" data-sem="2">
+        2学期
+        <small>利息・割引</small>
+      </button>
+      <button class="semester-tab s3" data-sem="3">
+        3学期
+        <small>簿記の等式</small>
+      </button>
+    </div>
+    <div id="equations-list"></div>
+  </div>
+
+  <!-- クイズモード -->
+  <div id="quiz-mode" style="display:none;">
+    <div class="quiz-container" id="quiz-content"></div>
+  </div>
+
+  <footer>📚 方程式マスター｜毎日コツコツ、得意になろう！</footer>
+</div>
+
+<script>
+// ============================
+// 方程式データ
+// ============================
+const equations = {
+  1: [ // 1学期：基礎計算（割合・損益の基本）
+    {
+      title: "割合の式",
+      formula: "比べる量 = もとにする量 × 割合",
+      story: "🍰 ケーキを8等分して、そのうち3切れを食べたよ。「もとにする量」は1ホール、「割合」は3/8、「比べる量」は食べた量。元の大きさ × どれくらいの割合 = 取り出した量、と覚えよう！",
+      example: "問題：500円のおこづかいの 0.4（4割）を使った。使った金額は？",
+      answer: "答え：500円 × 0.4 = 200円",
+      point: "💡『の』が出てきたら『×（かける）』に置き換えると分かりやすい！「500円の0.4」→「500×0.4」"
+    },
+    {
+      title: "百分率（パーセント）",
+      formula: "百分率(%) = 割合 × 100",
+      story: "🍕 ピザを100等分したと考えると分かりやすい！「0.25」は「100枚に分けた25枚分」=「25%」。割合を100倍するだけ！",
+      example: "問題：0.08 を百分率にすると？",
+      answer: "答え：0.08 × 100 = 8%",
+      point: "💡 逆に %を割合に戻すときは ÷100。「30% → 0.3」「7% → 0.07」"
+    },
+    {
+      title: "歩合（ぶあい）",
+      formula: "10% = 1割／1% = 1分（ぶ）／0.1% = 1厘（りん）",
+      story: "⚾ 野球の打率「3割2分5厘」は、商業の言葉では「32.5%」のこと！0.325 と同じ意味。スポーツ中継でよく聞く言葉、実は数学だった！",
+      example: "問題：『2割5分』を百分率と小数で表すと？",
+      answer: "答え：25% ／ 0.25",
+      point: "💡 割→10%、分→1%、厘→0.1% の階段。順番に下がっていくよ。"
+    },
+    {
+      title: "利益の式",
+      formula: "利益 = 売価 - 原価",
+      story: "🍙 100円で仕入れたおにぎりを150円で売ったら、儲け（利益）は50円。「売った値段」から「仕入れた値段」を引いた残りが、自分の取り分！",
+      example: "問題：原価800円の商品を1,200円で売った。利益は？",
+      answer: "答え：1,200 - 800 = 400円",
+      point: "💡 売価 = 原価 + 利益／原価 = 売価 - 利益 と、形を変えて使えるようにしよう。"
+    },
+    {
+      title: "売価の式（値入れ）",
+      formula: "売価 = 原価 × (1 + 値入率)",
+      story: "🛒 1,000円で仕入れた服に「2割もうけを乗せて売ろう」と決めたら、1,000 × 1.2 = 1,200円が売価。仕入れ値を『1』として、上乗せ分を足してから掛ける！",
+      example: "問題：原価600円、値入率20%（0.2）の売価は？",
+      answer: "答え：600 × (1 + 0.2) = 600 × 1.2 = 720円",
+      point: "💡『1 +』を忘れがち！『元の値段に上乗せする』イメージを思い出そう。"
+    },
+    {
+      title: "原価に対する利益率",
+      formula: "利益率 = 利益 ÷ 原価",
+      story: "💰 800円で仕入れて200円もうけた → 「仕入れたお金に対して、どれくらい増えたか」が利益率。200÷800 = 0.25 = 25%。投資した分に対する『増え方』！",
+      example: "問題：原価500円の商品で100円の利益。原価に対する利益率は？",
+      answer: "答え：100 ÷ 500 = 0.2 = 20%",
+      point: "💡『〜に対する』と書いてあったら、その金額が分母（÷の下）になる！"
+    },
+    {
+      title: "売価に対する利益率",
+      formula: "利益率 = 利益 ÷ 売価",
+      story: "🏷️ 1,000円で売って200円もうけたら、売価に対する利益率は 200÷1,000 = 20%。お客さんが払ったお金の何%が儲けだったかを見る指標！",
+      example: "問題：売価2,000円の商品で利益500円。売価に対する利益率は？",
+      answer: "答え：500 ÷ 2,000 = 0.25 = 25%",
+      point: "💡 同じ利益でも『原価に対する』と『売価に対する』では値が違う！どちらが分母か文章をよく読もう。"
+    },
+    {
+      title: "値引額・値引率",
+      formula: "値引額 = 売価 × 値引率",
+      story: "🛒 1,000円のシャツが『2割引』なら、1,000×0.2=200円安くなる。お買い得セールの計算！表示価格から、その割合分を引く！",
+      example: "問題：売価3,000円、値引率15%。値引額は？",
+      answer: "答え：3,000 × 0.15 = 450円",
+      point: "💡 値引き後の価格は『売価 − 値引額』または『売価 × (1 − 値引率)』で出せる。"
+    },
+    {
+      title: "見込利益率",
+      formula: "見込利益率 = (予定売価 − 原価) ÷ 原価",
+      story: "🎯 仕入れた商品に『これくらいで売れるはず』と予想して、もうけの率を見積もる。仕入れる前のシミュレーション！",
+      example: "問題：原価800円、予定売価1,000円。見込利益率は？",
+      answer: "答え：(1,000 − 800) ÷ 800 = 200 ÷ 800 = 0.25 = 25%",
+      point: "💡『見込（みこみ）』は『予定・予想』のこと。実際に売れる前の計算！"
+    },
+    {
+      title: "割増額・割増率",
+      formula: "割増額 = もとの金額 × 割増率",
+      story: "🎄 クリスマス特別価格！通常2,000円のケーキが『3割増し』で2,600円に。元の金額に、上乗せの割合分を足す！",
+      example: "問題：もとの金額5,000円、割増率20%。割増額は？",
+      answer: "答え：5,000 × 0.2 = 1,000円",
+      point: "💡 値引きの反対。『割増後の金額 = もとの金額 × (1 + 割増率)』。"
+    }
+  ],
+
+  2: [ // 2学期：利息・割引
+    {
+      title: "単利の利息",
+      formula: "利息 = 元金 × 利率 × 期間（年）",
+      story: "🏦 銀行に10万円を年利2%で2年預けると、利息は 100,000×0.02×2 = 4,000円。『預けたお金 × もらえる割合 × 預けた年数』で、コツコツ毎年同じだけ増える！",
+      example: "問題：元金50,000円を年利3%で4年間預けた利息は？",
+      answer: "答え：50,000 × 0.03 × 4 = 6,000円",
+      point: "💡 利率は小数で計算！3% → 0.03。期間が月の場合は『月÷12』で年に直す。"
+    },
+    {
+      title: "元利合計（単利）",
+      formula: "元利合計 = 元金 + 利息",
+      story: "🎁 預けたお金（元金）と、もらえた利息を合わせると『最終的に手元に戻る金額』。お年玉を貯金して、お小遣いと合体させるイメージ！",
+      example: "問題：元金20,000円、利息800円。元利合計は？",
+      answer: "答え：20,000 + 800 = 20,800円",
+      point: "💡 元金 × (1 + 利率 × 期間) でも一気に計算できる。"
+    },
+    {
+      title: "日数計算（日割り）",
+      formula: "利息 = 元金 × 利率 × 日数 ÷ 365",
+      story: "📅 1年丸々ではなく『73日だけ』預けた場合、1年分の利息を 73/365 だけもらう。ピザを365等分して73切れもらうイメージ！",
+      example: "問題：元金100,000円、年利5%、73日間の利息は？",
+      answer: "答え：100,000 × 0.05 × 73 ÷ 365 = 1,000円",
+      point: "💡 うるう年は ÷366。テスト問題では指示を確認しよう！"
+    },
+    {
+      title: "割引料（手形割引）",
+      formula: "割引料 = 手形金額 × 割引率 × 割引日数 ÷ 365",
+      story: "🎫 期日前に手形を銀行で現金化すると、『早く受け取る代金』として手数料を引かれる。コンサートチケットを早めに払い戻すと一部しか戻ってこない、あの感覚！",
+      example: "問題：手形金額200,000円、割引率4%、割引日数90日。割引料は？",
+      answer: "答え：200,000 × 0.04 × 90 ÷ 365 = 1,972円（円未満切り捨て）",
+      point: "💡 手形は『将来お金がもらえる紙』。早く現金化したいときの手数料が割引料。"
+    },
+    {
+      title: "手取金",
+      formula: "手取金 = 手形金額 - 割引料",
+      story: "💵 手形を現金化したときに実際に銀行から受け取る金額。額面から手数料（割引料）を引いた残り。買い物の値引き後の金額と同じ考え方！",
+      example: "問題：手形金額200,000円、割引料1,972円。手取金は？",
+      answer: "答え：200,000 - 1,972 = 198,028円",
+      point: "💡『額面（がくめん）』と『手取り』のちがいに注意！手元に来るのは手取金。"
+    },
+    {
+      title: "複利の元利合計",
+      formula: "元利合計 = 元金 × (1 + 利率)ⁿ ※n=期間",
+      story: "🌱 利息にも利息がつく『雪だるま方式』。最初の利息も元金に組み入れて、来年はもっと多い元金で計算。育てれば育てるほど大きくなる！",
+      example: "問題：元金10,000円、年利5%、2年複利の元利合計は？",
+      answer: "答え：10,000 × 1.05 × 1.05 = 11,025円",
+      point: "💡 単利との違い：単利は毎年同じ利息、複利は毎年少しずつ増える利息。"
+    },
+    {
+      title: "複利終価（しゅうか）",
+      formula: "複利終価 = 元金 × (1 + 利率)ⁿ",
+      story: "🌳 タネを植えて何年後に大きな木になるか？元金を植えて、複利で育てた『何年後の最終金額』。雪だるまの最終サイズ！",
+      example: "問題：元金10,000円、年利4%、3年複利の終価は？",
+      answer: "答え：10,000 × 1.04 × 1.04 × 1.04 ≒ 11,249円",
+      point: "💡『終価』は『最終の価値』。式は複利の元利合計と同じだが、用語として覚えよう。"
+    },
+    {
+      title: "複利現価（げんか）",
+      formula: "複利現価 = 終価 ÷ (1 + 利率)ⁿ",
+      story: "🔮 タイムマシンで時間を巻き戻す！『3年後に10,000円必要』なとき、今いくら預ければよい？将来のお金を『今の価値』に戻す計算。",
+      example: "問題：3年後に11,000円が必要。年利5%なら、今いくら必要？",
+      answer: "答え：11,000 ÷ 1.05 ÷ 1.05 ÷ 1.05 ≒ 9,503円",
+      point: "💡 終価の逆計算！将来のお金は『今のお金』より価値が低い、と考える。"
+    },
+    {
+      title: "年金終価（積立）",
+      formula: "年金終価 = 毎期積立額 × ((1+利率)ⁿ − 1) ÷ 利率",
+      story: "🐖 貯金箱に毎年コツコツお金を入れる。それぞれのお金にも利息がつく。何年後に中はいくら？毎期の積立を全部足した最終額！",
+      example: "問題：毎年10,000円、年利3%、3年積立。年金終価は？",
+      answer: "答え：10,000 × (1.03³ − 1) ÷ 0.03 ≒ 30,909円",
+      point: "💡 一度だけ預ける『複利終価』と違い、毎期積み立てるのが『年金終価』。"
+    },
+    {
+      title: "両端入れ・片端入れ（日数の数え方）",
+      formula: "両端入れ：両方の日を含む／片端入れ：片方だけ含む",
+      story: "📅 5月1日から5月5日までは何日？両端入れなら5日（1,2,3,4,5）。片端入れなら4日。問題によって数え方が変わる！",
+      example: "問題：6月10日〜6月20日。両端入れと片端入れ、それぞれ何日？",
+      answer: "答え：両端入れ＝11日／片端入れ＝10日",
+      point: "💡 問題文の『両端入れ』『片端入れ』の指示を必ずチェック！日数計算で点を落とさないコツ。"
+    }
+  ],
+
+  3: [ // 3学期：簿記の基本等式
+    {
+      title: "貸借対照表等式（基本中の基本！）",
+      formula: "資産 = 負債 + 純資産",
+      story: "🏠 マイホーム3,000万円（資産）= 住宅ローン2,000万円（負債）+ 自分のお金1,000万円（純資産）。持っているもの全部は、『借りた分』と『自分の分』に分けられる！",
+      example: "問題：負債300万円、純資産500万円。資産はいくら？",
+      answer: "答え：300 + 500 = 800万円",
+      point: "💡 簿記でいちばん大事な式！左（借方）と右（貸方）は必ずバランスする。"
+    },
+    {
+      title: "資本等式",
+      formula: "純資産（資本） = 資産 - 負債",
+      story: "💼 お店を畳んだとき、持ち物を全部売って、借金を全部返したら『手元に残るお金』が純資産。本当の自分の財産はこれ！",
+      example: "問題：資産1,000万円、負債400万円。純資産は？",
+      answer: "答え：1,000 - 400 = 600万円",
+      point: "💡 貸借対照表等式を移項しただけ。同じ式の形違い！"
+    },
+    {
+      title: "損益計算書等式",
+      formula: "当期純利益 = 収益 - 費用",
+      story: "🍔 ハンバーガー屋さんで1日売上10万円（収益）、材料費・人件費で7万円（費用）使った → 今日の儲けは3万円（純利益）。入ってきたお金 − 出ていったお金 = 残った儲け！",
+      example: "問題：収益800,000円、費用650,000円。当期純利益は？",
+      answer: "答え：800,000 - 650,000 = 150,000円",
+      point: "💡 マイナスになったら『当期純損失』。利益と損失は正反対！"
+    },
+    {
+      title: "財産法（純資産の増減）",
+      formula: "当期純利益 = 期末純資産 - 期首純資産",
+      story: "📈 1月（期首）に貯金10万円。12月（期末）に貯金15万円。1年で5万円増えた → これが今年の儲け！年初と年末の財産の差で利益を出す方法。",
+      example: "問題：期首純資産500万円、期末純資産620万円。当期純利益は？",
+      answer: "答え：620 - 500 = 120万円",
+      point: "💡 損益法（収益-費用）と財産法（期末-期首）は、別ルートで同じ答えにたどり着く！"
+    },
+    {
+      title: "売上総利益（粗利）",
+      formula: "売上総利益 = 売上高 - 売上原価",
+      story: "🍞 パン1個を80円で仕入れて、150円で売った。1個あたり70円の『粗利（あらり）』。商売の基本のもうけ。これが大きいほど良い商売！",
+      example: "問題：売上高1,500,000円、売上原価900,000円。売上総利益は？",
+      answer: "答え：1,500,000 - 900,000 = 600,000円",
+      point: "💡『粗利（あらり）』とも呼ぶ。ここから人件費などを引いて『営業利益』が出る。"
+    },
+    {
+      title: "売上原価の式",
+      formula: "売上原価 = 期首商品棚卸高 + 当期仕入高 - 期末商品棚卸高",
+      story: "📦 年初の在庫 + 今年仕入れた分 − 年末に売れ残った在庫 = 『今年売れた分のもとの値段』。冷蔵庫の食材で考えると：月初の残り + 買い足した分 − 月末の残り = 今月食べた分！",
+      example: "問題：期首50,000円、仕入500,000円、期末80,000円。売上原価は？",
+      answer: "答え：50,000 + 500,000 - 80,000 = 470,000円",
+      point: "💡『しいれ（仕入）』と『うりあげげんか（売上原価）』は別物！売れた分だけが原価。"
+    },
+    {
+      title: "試算表等式",
+      formula: "資産 + 費用 = 負債 + 純資産 + 収益",
+      story: "⚖️ 貸借対照表(資産=負債+純資産)に、損益計算書の項目を足した『もっと大きなバランス式』！全ての勘定が左右でピタッと釣り合う。",
+      example: "問題：資産600、費用200、負債300、純資産400。収益は？",
+      answer: "答え：600 + 200 = 300 + 400 + 収益 → 収益 = 100",
+      point: "💡 簿記の『試算表』はこの式が成り立つかを確認する表。合わなければどこかでミス！"
+    },
+    {
+      title: "期末資本の式",
+      formula: "期末資本 = 期首資本 + 追加元入 − 引出金 + 当期純利益",
+      story: "💰 1年で資本がいくら増えたか？元々のお金 ＋ 追加で入れたお金 − 個人的に使ったお金 ＋ 1年のもうけ = 期末の資本！",
+      example: "問題：期首200万、追加元入50万、引出30万、純利益70万。期末資本は？",
+      answer: "答え：200 + 50 − 30 + 70 = 290万円",
+      point: "💡『追加元入（もといれ）』は資本を増やすために入れたお金、『引出金』は店主が私用に使ったお金。"
+    },
+    {
+      title: "営業利益",
+      formula: "営業利益 = 売上総利益 − 販売費及び一般管理費",
+      story: "🏪 お店の『本業のもうけ』！パン屋なら、パンの粗利から店員さんの給料・家賃・電気代を引いた残り。これがお店の実力！",
+      example: "問題：売上総利益500万、販管費300万。営業利益は？",
+      answer: "答え：500 − 300 = 200万円",
+      point: "💡『販管費（はんかんひ）』は店を動かすための費用ぜんぶ。"
+    },
+    {
+      title: "経常利益（けいじょうりえき）",
+      formula: "経常利益 = 営業利益 ± 営業外損益",
+      story: "💼 本業以外でも、預金の利息（営業外収益）や、借入金の支払利息（営業外費用）がある。本業＋ふだんの副業収支＝『いつもの利益』！",
+      example: "問題：営業利益200万、受取利息10万、支払利息30万。経常利益は？",
+      answer: "答え：200 + 10 − 30 = 180万円",
+      point: "💡『経常』は『いつもの』。臨時のもの（特別損益）は含まれない。"
+    },
+    {
+      title: "当期純利益（損益計算書の最終）",
+      formula: "当期純利益 = 経常利益 ± 特別損益 − 法人税等",
+      story: "🏆 1年間のもうけのファイナルアンサー！本業＋副業の利益から、たまにある大きな出費（災害損失など）や税金を引いた、最終もうけ！",
+      example: "問題：経常利益500万、特別損失50万、法人税150万。当期純利益は？",
+      answer: "答え：500 − 50 − 150 = 300万円",
+      point: "💡『特別損益』は地震・火災など、めったにないやつ。3学期の『収益−費用』と同じ最終利益。"
+    },
+    {
+      title: "現金過不足",
+      formula: "現金過不足 = 帳簿残高 − 実際有高",
+      story: "💸 レジを締めたら、帳簿は10,000円なのに実際は9,500円しかない！『500円足りない』これが現金過不足。お店ではよくある事件！",
+      example: "問題：帳簿残高30,000円、実際有高28,800円。過不足は？",
+      answer: "答え：30,000 − 28,800 = 1,200円（不足）",
+      point: "💡 プラスなら『過剰』、マイナスなら『不足』。原因が分かれば正しい勘定に振り替える。"
+    }
+  ]
+};
+
+// ============================
+// 学習モード
+// ============================
+const equationsList = document.getElementById('equations-list');
+let currentSemester = 1;
+
+function renderEquations(sem) {
+  const items = equations[sem];
+  equationsList.innerHTML = items.map((eq, i) => `
+    <div class="equation-card s${sem}">
+      <div class="card-header">
+        <div class="card-number">${i+1}</div>
+        <div class="card-title">${eq.title}</div>
+      </div>
+      <div class="formula-box">${eq.formula}</div>
+      <div class="section-label label-story">🎬 たとえ話</div>
+      <div class="story-box">${eq.story}</div>
+      <div class="section-label label-example">📝 例題</div>
+      <div class="example-box">
+        ${eq.example}
+        <div class="answer">${eq.answer}</div>
+      </div>
+      <div class="section-label label-point">💡 おぼえるポイント</div>
+      <div class="point-box">${eq.point}</div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('.semester-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.semester-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentSemester = parseInt(tab.dataset.sem);
+    renderEquations(currentSemester);
+  });
+});
+
+// ============================
+// モード切替
+// ============================
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    if (tab.dataset.mode === 'learn') {
+      document.getElementById('learn-mode').style.display = 'block';
+      document.getElementById('quiz-mode').style.display = 'none';
+    } else {
+      document.getElementById('learn-mode').style.display = 'none';
+      document.getElementById('quiz-mode').style.display = 'block';
+      renderQuizStart();
+    }
+  });
+});
+
+// ============================
+// クイズデータ
+// ============================
+const quizData = {
+  1: [
+    { q: "売価 = 原価 + ?", options: ["利益", "割引", "利息", "費用"], correct: 0, hint: "売値は仕入れ値に儲けを足した金額！" },
+    { q: "原価600円、値入率20%。売価は？", options: ["620円", "720円", "120円", "480円"], correct: 1, hint: "600 × (1 + 0.2) = 720円" },
+    { q: "『2割5分』を小数で表すと？", options: ["0.025", "0.25", "2.5", "25"], correct: 1, hint: "割=10%、分=1%。2割5分=25%=0.25" },
+    { q: "原価800円を1,000円で売った。利益は？", options: ["100円", "200円", "800円", "1,800円"], correct: 1, hint: "売価 − 原価 = 1,000 − 800 = 200円" },
+    { q: "百分率を割合に直すには？", options: ["×100", "÷100", "×10", "そのまま"], correct: 1, hint: "%は100倍された数。元に戻すには ÷100" },
+    { q: "原価500円、利益150円。原価に対する利益率は？", options: ["15%", "20%", "30%", "50%", ], correct: 2, hint: "150 ÷ 500 = 0.3 = 30%" },
+    { q: "売価2,000円、利益400円。売価に対する利益率は？", options: ["10%", "20%", "25%", "40%"], correct: 1, hint: "400 ÷ 2,000 = 0.2 = 20%" },
+    { q: "売価4,000円、値引率10%。値引額は？", options: ["40円", "400円", "4,000円", "3,600円"], correct: 1, hint: "4,000 × 0.1 = 400円" },
+    { q: "原価1,000円、予定売価1,200円。見込利益率は？", options: ["10%", "16.7%", "20%", "25%"], correct: 2, hint: "(1,200 − 1,000) ÷ 1,000 = 0.2 = 20%" },
+    { q: "もとの金額3,000円、割増率15%。割増額は？", options: ["150円", "300円", "450円", "3,450円"], correct: 2, hint: "3,000 × 0.15 = 450円" }
+  ],
+  2: [
+    { q: "単利の利息の公式は？", options: ["元金+利率+期間", "元金×利率×期間", "元金÷利率÷期間", "元金×利率+期間"], correct: 1, hint: "預けたお金 × もらえる割合 × 預けた年数" },
+    { q: "元金10万円、年利2%、3年の単利。利息は？", options: ["2,000円", "6,000円", "20,000円", "60,000円"], correct: 1, hint: "100,000 × 0.02 × 3 = 6,000円" },
+    { q: "73日間の利息計算では何で割る？", options: ["12", "30", "100", "365"], correct: 3, hint: "1年=365日。その何日分かを計算！" },
+    { q: "手形を期日前に現金化するときの手数料は？", options: ["利息", "割引料", "値入額", "原価"], correct: 1, hint: "早く受け取る代わりに引かれるのが『割引料』" },
+    { q: "手形金額30万円、割引料5,000円。手取金は？", options: ["305,000円", "295,000円", "300,000円", "5,000円"], correct: 1, hint: "300,000 − 5,000 = 295,000円" },
+    { q: "複利の特徴は？", options: ["毎年同じ利息", "利息にも利息がつく", "元金が減る", "期間が短い"], correct: 1, hint: "雪だるま式に増えていく！" },
+    { q: "元金10,000円、年利4%、3年複利の終価に近いのは？", options: ["10,400円", "11,000円", "11,249円", "12,000円"], correct: 2, hint: "10,000 × 1.04 × 1.04 × 1.04 ≒ 11,249円" },
+    { q: "複利現価の意味は？", options: ["将来のお金の今の価値", "今のお金の将来の価値", "毎期の積立額", "利息の合計"], correct: 0, hint: "タイムマシンで今に戻す！" },
+    { q: "毎期積み立てて運用するときの最終額の名前は？", options: ["複利終価", "複利現価", "年金終価", "単利"], correct: 2, hint: "『年金』＝毎期コツコツ。最後の合計が『年金終価』" },
+    { q: "5月1日〜5月10日、両端入れだと何日？", options: ["9日", "10日", "11日", "12日"], correct: 1, hint: "両端入れ＝両方の日を含む。1〜10で10日" }
+  ],
+  3: [
+    { q: "貸借対照表等式は？", options: ["資産=収益+費用", "資産=負債+純資産", "収益=費用+利益", "純資産=収益-費用"], correct: 1, hint: "持ち物 = 借りたぶん + 自分のぶん" },
+    { q: "資産1,000万、負債400万。純資産は？", options: ["1,400万", "600万", "400万", "1,000万"], correct: 1, hint: "1,000 − 400 = 600万円" },
+    { q: "当期純利益の計算式は？", options: ["収益+費用", "収益-費用", "費用-収益", "収益×費用"], correct: 1, hint: "入ってきたお金 − 出ていったお金 = 儲け" },
+    { q: "期首純資産200万、期末純資産250万。純利益は？", options: ["50万", "200万", "250万", "450万"], correct: 0, hint: "期末 − 期首 = 増えた分 = 利益" },
+    { q: "売上総利益（粗利）の式は？", options: ["売上高+売上原価", "売上高-売上原価", "売上原価-売上高", "売上高×売上原価"], correct: 1, hint: "売れた金額 − 仕入れた金額" },
+    { q: "売上原価の計算で『引く』のは？", options: ["期首棚卸高", "当期仕入高", "期末棚卸高", "売上高"], correct: 2, hint: "売れ残った在庫（期末分）は今期の原価から外す！" },
+    { q: "試算表等式は？", options: ["資産=負債+純資産", "資産+費用=負債+純資産+収益", "収益=費用+利益", "資産=収益−費用"], correct: 1, hint: "B/SとP/Lを合体させたバランス式！" },
+    { q: "期首資本100万、追加元入20万、引出10万、純利益30万。期末資本は？", options: ["120万", "130万", "140万", "160万"], correct: 2, hint: "100+20−10+30 = 140万円" },
+    { q: "営業利益の式は？", options: ["売上高−売上原価", "売上総利益−販管費", "経常利益−税金", "売上総利益+販管費"], correct: 1, hint: "粗利から販管費を引く=お店の本業のもうけ" },
+    { q: "営業利益200万、受取利息5万、支払利息15万。経常利益は？", options: ["180万", "190万", "200万", "220万"], correct: 1, hint: "200+5−15 = 190万円" },
+    { q: "経常利益400万、特別損失50万、法人税100万。当期純利益は？", options: ["150万", "200万", "250万", "350万"], correct: 2, hint: "400−50−100 = 250万円" },
+    { q: "帳簿残高50,000円、実際有高48,500円。現金過不足は？", options: ["過剰1,500円", "不足1,500円", "過剰500円", "不足500円"], correct: 1, hint: "帳簿−実際=50,000−48,500=1,500円不足" }
+  ]
+};
+
+// ============================
+// クイズモード
+// ============================
+const quizContent = document.getElementById('quiz-content');
+let quizState = {
+  questions: [],
+  current: 0,
+  score: 0,
+  answered: false
+};
+
+function renderQuizStart() {
+  quizContent.innerHTML = `
+    <div class="quiz-start">
+      <h2>✏️ 方程式クイズ</h2>
+      <p>どの範囲から出題する？<br>選んでスタート！</p>
+      <div class="quiz-range">
+        <button class="range-btn selected" data-range="1">1学期だけ</button>
+        <button class="range-btn" data-range="2">2学期だけ</button>
+        <button class="range-btn" data-range="3">3学期だけ</button>
+        <button class="range-btn" data-range="all">ぜんぶ（総まとめ）</button>
+      </div>
+      <button class="quiz-btn" id="start-quiz-btn">スタート！</button>
+    </div>
+  `;
+  let selectedRange = "1";
+  document.querySelectorAll('.range-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.range-btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      selectedRange = b.dataset.range;
+    });
+  });
+  document.getElementById('start-quiz-btn').addEventListener('click', () => startQuiz(selectedRange));
+}
+
+function startQuiz(range) {
+  let pool = [];
+  if (range === "all") {
+    pool = [...quizData[1], ...quizData[2], ...quizData[3]];
+  } else {
+    pool = [...quizData[range]];
+  }
+  // シャッフル
+  pool.sort(() => Math.random() - 0.5);
+  quizState = { questions: pool, current: 0, score: 0, answered: false };
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const q = quizState.questions[quizState.current];
+  const total = quizState.questions.length;
+  const progress = ((quizState.current) / total) * 100;
+
+  quizContent.innerHTML = `
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar" style="width: ${progress}%"></div>
+    </div>
+    <div class="quiz-meta">
+      <span>第 ${quizState.current + 1} / ${total} 問</span>
+      <span>正解数：${quizState.score}</span>
+    </div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options">
+      ${q.options.map((opt, i) => `
+        <button class="quiz-option" data-i="${i}">${opt}</button>
+      `).join('')}
+    </div>
+    <div class="quiz-feedback" id="feedback"></div>
+    <button class="quiz-btn" id="next-btn" style="display:none;">
+      ${quizState.current + 1 >= total ? '結果を見る 🎉' : '次の問題 →'}
+    </button>
+  `;
+
+  document.querySelectorAll('.quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (quizState.answered) return;
+      quizState.answered = true;
+      const chosen = parseInt(btn.dataset.i);
+      const correct = q.correct;
+      document.querySelectorAll('.quiz-option').forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.classList.add('correct');
+        else if (i === chosen) b.classList.add('wrong');
+      });
+      const fb = document.getElementById('feedback');
+      if (chosen === correct) {
+        quizState.score++;
+        fb.className = 'quiz-feedback correct show';
+        fb.innerHTML = `⭕ 正解！<br>${q.hint}`;
+      } else {
+        fb.className = 'quiz-feedback wrong show';
+        fb.innerHTML = `❌ ざんねん…<br>正解は「<b>${q.options[correct]}</b>」<br>${q.hint}`;
+      }
+      document.getElementById('next-btn').style.display = 'block';
+    });
+  });
+
+  document.getElementById('next-btn').addEventListener('click', () => {
+    quizState.current++;
+    quizState.answered = false;
+    if (quizState.current >= quizState.questions.length) {
+      renderQuizResult();
+    } else {
+      renderQuizQuestion();
+    }
+  });
+}
+
+function renderQuizResult() {
+  const total = quizState.questions.length;
+  const score = quizState.score;
+  const percent = Math.round((score / total) * 100);
+  let message = "";
+  let emoji = "";
+  if (percent === 100) { message = "完璧！方程式マスターだね！"; emoji = "🏆"; }
+  else if (percent >= 80) { message = "とても良くできました！この調子！"; emoji = "🌟"; }
+  else if (percent >= 60) { message = "合格ライン！もう少しで完璧！"; emoji = "👍"; }
+  else if (percent >= 40) { message = "おしい！もう一度学習に戻ってみよう。"; emoji = "📚"; }
+  else { message = "まずは「まなぶ」モードで公式を確認しよう！"; emoji = "💪"; }
+
+  quizContent.innerHTML = `
+    <div class="quiz-result">
+      <div style="font-size: 60px;">${emoji}</div>
+      <div class="result-score">${score} / ${total}</div>
+      <div style="color:#777; margin-bottom: 10px;">正答率 ${percent}%</div>
+      <div class="result-message">${message}</div>
+      <button class="quiz-btn" id="restart-btn">もう一度チャレンジ</button>
+      <button class="quiz-btn" id="back-btn" style="background: #757575; margin-top: 8px;">範囲を選び直す</button>
+    </div>
+  `;
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    quizState.questions.sort(() => Math.random() - 0.5);
+    quizState.current = 0;
+    quizState.score = 0;
+    quizState.answered = false;
+    renderQuizQuestion();
+  });
+  document.getElementById('back-btn').addEventListener('click', renderQuizStart);
+}
+
+// 初期表示
+renderEquations(1);
+</script>
+</body>
+</html>
